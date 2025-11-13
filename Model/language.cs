@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class language
+    public class language : BaseEntity
     {
-        private int id;
+      
         private string languagename;
 
-        public int Id { get => id; set => id = value; }
+     
         public string Languagename { get => languagename; set => languagename = value; }
     }
 }

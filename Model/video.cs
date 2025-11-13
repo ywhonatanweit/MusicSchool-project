@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class video
+    public class video:BaseEntity
     {
-        private int id;
-        private int songid;
+        private song songid;
+        private string songAddress;
 
-        public int Id { get => id; set => id = value; }
-        public int Songid { get => songid; set => songid = value; }
+        public song Songid { get => songid; set => songid = value; }
+        public string SongAddress { get => songAddress; set => songAddress = value; }
     }
 }

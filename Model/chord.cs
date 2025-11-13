@@ -1,19 +1,24 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class chord
+    public class chord:BaseEntity
     {
-        private int id;
+       
         private string name;
-        private int difficulty;
+        private difficulty difficulty;
 
-        public int Id { get => id; set => id = value; }
         public string Name { get => name; set => name = value; }
-        public int Difficulty { get => difficulty; set => difficulty = value; }
+        public difficulty Difficulty { get => difficulty; set => difficulty = value; }
+
+        public override string ToString()
+        {
+            return Name + "  "+Difficulty;
+        }
     }
 }

@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class student
+    public class student:person
     {
-        private int id;
-        private string name;
-
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+   
     }
 }

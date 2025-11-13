@@ -1,23 +1,22 @@
-﻿using System;
+﻿using Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class lyrics
+    public class lyrics:BaseEntity
     {
-        private int id;
-        private int songid;
+        private song songid;
         private int placment;
-        private int chordid;
+        private chord chordid;
         private string lyricsname;
 
-        public int Id { get => id; set => id = value; }
-        public int Songid { get => songid; set => songid = value; }
+        public song Songid { get => songid; set => songid = value; }
         public int Placment { get => placment; set => placment = value; }
-        public int Chordid { get => chordid; set => chordid = value; }
+        public chord Chordid { get => chordid; set => chordid = value; }
         public string Lyricsname { get => lyricsname; set => lyricsname = value; }
     }
 }

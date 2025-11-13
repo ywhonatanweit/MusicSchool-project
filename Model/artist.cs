@@ -1,15 +1,9 @@
-﻿namespace project_dani_andreev
+﻿namespace Model
 {
-    public class artist : person
+    public class Artist : person
     {
-        private int Id;
-        private string artistname;
 
-        public int Id1 { get => Id; set => Id = value; }
-        public string Artistname { get => artistname; set => artistname = value; }
-
-   
     }
-  }
+}
 
 

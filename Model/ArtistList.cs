@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
     
     
-        public class ArtistList : List<artist>
+        public class ArtistList : List<Artist>
         {
             public ArtistList() { }
-            public ArtistList(IEnumerable<artist> list) : base(list) { }
-            public ArtistList(IEnumerable<BaseEntity> list) : base(list.Cast<artist>().ToList()) { }
+            public ArtistList(IEnumerable<Artist> list) : base(list) { }
+            public ArtistList(IEnumerable<BaseEntity> list) : base(list.Cast<Artist>().ToList()) { }
         }
     
 }

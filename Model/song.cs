@@ -4,22 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace project_dani_andreev
+namespace Model
 {
-    internal class song
+    public class song:BaseEntity
     {
-        private int id;
         private string name;
-        private int artistid;
-        private int gaenreid;
-        private int difficultyid;
-        private int languageid;
+        private Artist artistid;
+        private genre gaenreid;
+        private difficulty difficultyid;
+        private language languageid;
 
-        public int Id { get => id; set => id = value; }
         public string Name { get => name; set => name = value; }
-        public int Artistid { get => artistid; set => artistid = value; }
-        public int Gaenreid { get => gaenreid; set => gaenreid = value; }
-        public int Difficultyid { get => difficultyid; set => difficultyid = value; }
-        public int Languageid { get => languageid; set => languageid = value; }
+        public Artist Artistid { get => artistid; set => artistid = value; }
+        public genre Gaenreid { get => gaenreid; set => gaenreid = value; }
+        public difficulty Difficultyid { get => difficultyid; set => difficultyid = value; }
+        public language Languageid { get => languageid; set => languageid = value; }
     }
 }
