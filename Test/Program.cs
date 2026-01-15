@@ -1,6 +1,11 @@
 ﻿using Model;
-using ViewModel;
+using System;
 using System.Data.OleDb;
+using ViewModel;
+using Service;
+using ApiMusic;
+using System.Net.Http.Json;
+
 
 namespace Test
 {
@@ -8,9 +13,9 @@ namespace Test
     {
         static void Main(string[] args)
         {
-
-            #region song
-            SongDB sdb = new();
+    
+                #region song
+                SongDB sdb = new();
             SongList sList = sdb.SelectAll();
             foreach (song c in sList)
             {
@@ -21,10 +26,12 @@ namespace Test
                 Console.WriteLine(c.Languageid);
             }
             song songToUpdate = sList[0];
-            songToUpdate.Name += " חדש";
+            songToUpdate.Name = " חדש";
             sdb.Update(songToUpdate);
             int xs = sdb.SaveChanges();
             Console.WriteLine($"{xs} rows were updated");
+
+          
 
             #endregion
 
@@ -149,6 +156,90 @@ namespace Test
             Console.WriteLine($"{xa} rows were updated");
 
             #endregion
+
+
+
+            #region song
+
+            song s = new song() { Name = "קוצים",  Difficultyid = dList[0], Artistid = aList[0],Languageid= lList[0], Gaenreid = gList[0] };
+            SongDB songDB = new SongDB();
+            songDB.Insert(s);
+            int xx=songDB.SaveChanges();
+
+            SongList sdelete = songDB.SelectAll();
+            songDB.Delete(sdelete.Last());
+            xx = songDB.SaveChanges();
+
+
+
+            // Artist
+            Artist a = new Artist() { Name= "kanye west", Code=1334,  };
+            ArtistDB artistDB = new ArtistDB();
+            artistDB.Insert(a);
+            int xx2 = artistDB.SaveChanges();
+
+            ArtistList adelete = artistDB.SelectAll();
+            artistDB.Delete(adelete.Last());
+            xx2 = artistDB.SaveChanges();
+
+
+            // Chord
+            chord ch = new chord() {  Name="csus7", Difficulty = dList[4] };
+            ChordDB chordDB = new ChordDB();
+            chordDB.Insert(ch);
+            int xx3 = chordDB.SaveChanges();
+            ChordList cdelete = chordDB.SelectAll();
+            chordDB.Delete(cdelete.Last());
+            xx3 = chordDB.SaveChanges();
+
+            // Difficulty
+            difficulty d = new difficulty() { Diff=2};
+            DifficultyDB difficultyDB = new DifficultyDB();
+            difficultyDB.Insert(d);
+            int xx4 = difficultyDB.SaveChanges();
+            DifficultyList ddelete = difficultyDB.SelectAll();
+            difficultyDB.Delete(ddelete.Last());
+            xx4 = difficultyDB.SaveChanges();
+
+            // Genre
+            genre g = new genre() { Genrename="sad" };
+            GenreDB genreDB = new GenreDB();
+            genreDB.Insert(g);
+            int xx5 = genreDB.SaveChanges();
+            GenreList gdelete = genreDB.SelectAll();
+            genreDB.Delete(gdelete.Last());
+            xx5 = genreDB.SaveChanges();
+
+            // Language
+            language l = new language() { Languagename="italian" };
+            LanguageDB languageDB = new LanguageDB();
+            languageDB.Insert(l);
+            int xx6 = languageDB.SaveChanges();
+            LanguageList ldelete = languageDB.SelectAll();
+            languageDB.Delete(ldelete.Last());
+             xx6 = languageDB.SaveChanges();
+
+            // Lyrics
+            lyrics ly = new lyrics() { Chordid = chList[0], Lyricsname = "i got a feeling", Placment = 1, Songid = sList[0] };
+            LyricsDB lyricsDB = new LyricsDB();
+            lyricsDB.Insert(ly);
+            int xx7 = lyricsDB.SaveChanges();
+            LyricsList lydelete = lyricsDB.SelectAll();
+            lyricsDB.Delete(lydelete.Last());
+            xx7 = lyricsDB.SaveChanges();
+
+            // Person
+            person p = new person() { Code=32, Name="noam" };
+            PersonDB personDB = new PersonDB();
+            personDB.Insert(p);
+            int xx8 = personDB.SaveChanges();
+            PersonList pdelete = personDB.SelectAll();
+            personDB.Delete(pdelete.Last());
+            xx8 = personDB.SaveChanges();
+
+            #endregion
+
+
 
         }
     }

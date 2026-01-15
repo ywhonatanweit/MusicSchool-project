@@ -1,6 +1,7 @@
 ﻿using Model;
 using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -40,42 +41,35 @@ namespace ViewModel
             return g;
         }
 
+      //  שלב ב
+        protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
+        {
+            Artist c = entity as Artist;
+            if (c != null)
+            {
+                string sqlStr = $"DELETE FROM ArtistTbl where id=@aid";
 
-        //שלב ב
-        //protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
-        //{
-        //    Person c = entity as Person;
-        //    if (c != null)
-        //    {
-        //        string sqlStr = $"DELETE FROM PersonTbl where id=@pid";
+                command.CommandText = sqlStr;
+                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+            }
+        }
+        protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
+        {
+            Artist c = entity as Artist;
+            if (c != null)
+            {
+                string sqlStr = $"Insert INTO  ArtistTbl (ID) VALUES (@aid)";
 
-        //        command.CommandText = sqlStr;
-        //        command.Parameters.Add(new OleDbParameter("@pid", c.Id));
-        //    }
-        //}
-        //protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
-        //{
-        //    Person c = entity as Person;
-        //    if (c != null)
-        //    {
-        //        string sqlStr = $"Insert INTO  PersonTbl (PersonName) VALUES (@cName)";
+                command.CommandText = sqlStr;
+                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+            }
+        }
+        //לא רושם את הפעולה של העדכון כי אין מה לעדכן, יש רק מפתח ראשי
+        protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
+             {
+          
 
-        //        command.CommandText = sqlStr;
-        //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
-        //    }
-        //}
-       //לא רושם את הפעולה של העדכון כי אין מה לעדכן, יש רק מפתח ראשי
-        //protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
-        //{
-        //    Artist c = entity as Artist;
-        //    if (c != null)
-        //    {
-        //        string sqlStr = $"UPDATE ArtistTbl  SET PersonName=@cName WHERE ID=@id";
+             }
 
-        //        command.CommandText = sqlStr;
-        //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
-        //        command.Parameters.Add(new OleDbParameter("@id", c.Id));
-        //    }
-        //}
-    }
-}
+        }
+    } 

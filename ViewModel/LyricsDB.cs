@@ -47,12 +47,33 @@ namespace ViewModel
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            language x = entity as language;
+            if (x != null)
+            {
+                string sqlStr = $"DELETE FROM LanguageTbl where id=@pid";
+
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@pid", x.Id));
+            }
         }
 
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            lyrics p = entity as lyrics;
+            if (p != null)
+            {
+                string sqlStr = $"Insert INTO LyricsTbl (id,songid,placment,chordid,lyrics) " +
+                                "VALUES (@id,@sid,@pl,@chid,@lyrics)";
+
+                command.CommandText = sqlStr;
+
+                command.Parameters.Add(new OleDbParameter("@id", p.Id));
+                command.Parameters.Add(new OleDbParameter("@sid", p.Songid.Id));
+                command.Parameters.Add(new OleDbParameter("@pl", p.Placment));
+                command.Parameters.Add(new OleDbParameter("@chid", p.Chordid.Id));
+                command.Parameters.Add(new OleDbParameter("@lyrics", p.Lyricsname));
+
+            }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)

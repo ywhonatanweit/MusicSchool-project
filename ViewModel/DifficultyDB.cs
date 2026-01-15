@@ -50,12 +50,26 @@ namespace ViewModel
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            difficulty x = entity as difficulty;
+            if (x != null)
+            {
+                string sqlStr = $"DELETE FROM DifficultyTbl where id=@pid";
+
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@pid", x.Id));
+            }
         }
 
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            difficulty c = entity as difficulty;
+            if (c != null)
+            {
+                string sqlStr = $"Insert INTO DifficultyTbl (diff) VALUES (@diff)";
+
+                command.CommandText = sqlStr;
+                command.Parameters.Add(new OleDbParameter("@diff", c.Diff));
+            }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)

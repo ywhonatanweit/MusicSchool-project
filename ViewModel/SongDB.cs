@@ -24,7 +24,7 @@ namespace ViewModel
             song a = entity as song;
             a.Name = reader["songname"].ToString();
             a.Artistid =ArtistDB.SelectById( int.Parse(reader["artistid"].ToString())  );
-            a.Gaenreid = GenreDB.SelectById(int.Parse(reader["genreid"].ToString()));
+            a.Gaenreid = GenreDB.SelectById(int.Parse(reader["ganreid"].ToString()));
             a.Difficultyid = DifficultyDB.SelectById(int.Parse(reader["difficultyid"].ToString()));
             a.Languageid = LanguageDB.SelectById(int.Parse(reader["languageid"].ToString()));
 
@@ -48,12 +48,34 @@ namespace ViewModel
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            song x = entity as song;
+            if (x != null)
+            {
+                string sqlStr = $"DELETE FROM SongTbl where id=@pid";
+
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@pid", x.Id));
+
+            }
         }
 
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            song p = entity as song;
+            if (p != null)
+            {
+                string sqlStr = $"Insert INTO  SongTbl (id,songname,artistid,ganreid,difficultyid,languageid) " +
+                                "VALUES (@id,@sname,@aid,@gid,@did,@lid)";
+
+                command.CommandText = sqlStr;
+
+                command.Parameters.Add(new OleDbParameter("@id", p.Id));
+                command.Parameters.Add(new OleDbParameter("@sname", p.Name));
+                command.Parameters.Add(new OleDbParameter("@aid", p.Artistid.Id));
+                command.Parameters.Add(new OleDbParameter("@gid", p.Gaenreid.Id));
+                command.Parameters.Add(new OleDbParameter("@did", p.Difficultyid.Id));
+                command.Parameters.Add(new OleDbParameter("@lid", p.Languageid.Id));
+            }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)

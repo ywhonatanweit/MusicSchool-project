@@ -43,12 +43,32 @@ namespace ViewModel
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            chord x = entity as chord;
+            if (x != null)
+            {
+                string sqlStr = $"DELETE FROM ChordTbl where id=@pid";
+
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@pid", x.Id));
+            }
         }
 
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            throw new NotImplementedException();
+            chord p = entity as chord;
+            if (p != null)
+            {
+                string sqlStr = $"Insert INTO ChordTbl (Id,chord,difficulty) " +
+                                "VALUES (@id,@chord,@diff)";
+
+                command.CommandText = sqlStr;
+
+                command.Parameters.Add(new OleDbParameter("@id", p.Id));
+                command.Parameters.Add(new OleDbParameter("@chord", p.Name));
+                command.Parameters.Add(new OleDbParameter("@difficulty", p.Difficulty.Id));
+
+
+            }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)

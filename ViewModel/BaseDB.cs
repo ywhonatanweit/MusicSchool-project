@@ -138,9 +138,9 @@ namespace ViewModel
         protected abstract void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd);
         public static List<ChangeEntity> inserted = new List<ChangeEntity>();
 
-
-        public virtual void Insert(BaseEntity entity)
-        {
+     public virtual void Insert(BaseEntity entity)
+  
+         {
             BaseEntity reqEntity = this.NewEntity();
             if (entity != null & entity.GetType() == reqEntity.GetType())
             {
