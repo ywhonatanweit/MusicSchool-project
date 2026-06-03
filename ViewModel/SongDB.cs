@@ -36,11 +36,22 @@ namespace ViewModel
             base.CreateModel(entity);
             return a;
         }
+
+        /// <summary>
+        /// return null when song not found
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public string SelectSongPicBySongId(int id)
         {
             SongList sList = SelectAll();
             song song = sList.Find(x => x.Id == id);
 
+            if (song == null)
+            {
+                return null;
+            }
             string pic = song.SongPic;
             return pic;
         }
