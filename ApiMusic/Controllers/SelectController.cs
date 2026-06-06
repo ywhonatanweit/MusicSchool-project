@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Model;
 using System;
 using ViewModel;
+using System.Linq;
 
 namespace ApiSelect.Controllers
 {
@@ -105,21 +106,55 @@ namespace ApiSelect.Controllers
         #region insert
 
         [HttpPost]
-        public int InsertAAdmin(Admin a)
+        [HttpPost]
+        [ActionName("InsertAAdmin")]
+        public int InsertAAdmin([FromBody] Admin a)
         {
-            AdminDB db = new AdminDB();
-            db.Insert(a);
-            int x = db.SaveChanges();
-            return x;
+            try
+            {
+                AdminDB db = new AdminDB();
+
+                AdminList admins = db.SelectAll();
+                Admin existing = admins.FirstOrDefault(x => x.Id == a.Id);
+
+                if (existing != null)
+                {
+                    return 1;
+                }
+
+                db.Insert(a);
+                return db.SaveChanges();
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         [HttpPost]
-        public int InsertAArtist(Artist a)
+        [HttpPost]
+        [ActionName("InsertAArtist")]
+        public int InsertAArtist([FromBody] Artist a)
         {
-            ArtistDB db = new ArtistDB();
-            db.Insert(a);
-            int x = db.SaveChanges();
-            return x;
+            try
+            {
+                ArtistDB db = new ArtistDB();
+
+                ArtistList artists = db.SelectAll();
+                Artist existing = artists.FirstOrDefault(x => x.Id == a.Id);
+
+                if (existing != null)
+                {
+                    return 1;
+                }
+
+                db.Insert(a);
+                return db.SaveChanges();
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         [HttpPost]

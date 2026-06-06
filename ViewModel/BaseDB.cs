@@ -53,32 +53,42 @@ namespace ViewModel
         protected List<BaseEntity> Select()
         {
             List<BaseEntity> list = new List<BaseEntity>();
-            try
+
+            using (OleDbConnection localConnection = new OleDbConnection(connectionString))
             {
-                command.Connection = connection;
-                if (connection.State != ConnectionState.Open)
+                using (OleDbCommand localCommand = new OleDbCommand(command.CommandText, localConnection))
                 {
-                    connection.Open();
+                    foreach (OleDbParameter parameter in command.Parameters)
+                    {
+                        localCommand.Parameters.Add(new OleDbParameter(parameter.ParameterName, parameter.Value));
+                    }
+
+                    try
+                    {
+                        localConnection.Open();
+
+                        using (OleDbDataReader localReader = localCommand.ExecuteReader())
+                        {
+                            reader = localReader;
+
+                            while (reader.Read())
+                            {
+                                BaseEntity entity = NewEntity();
+                                list.Add(CreateModel(entity));
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(e.Message + "\nSQL:" + command.CommandText);
+                    }
+                    finally
+                    {
+                        reader = null;
+                    }
                 }
-
-                reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    BaseEntity entity = NewEntity();
-                    list.Add(CreateModel(entity));
-                }
             }
-            catch (Exception e)
-            {
 
-                throw new Exception(e.Message + "\nSQL:" + command.CommandText);
-            }
-            finally
-            {
-                if (reader != null) reader.Close();
-                //   if (connection.State == ConnectionState.Open) connection.Close();
-            }
             return list;
         }
 

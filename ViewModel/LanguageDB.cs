@@ -21,6 +21,9 @@ namespace ViewModel
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             language a = entity as language;
+
+            a.Languagename = reader["language"].ToString();
+
             base.CreateModel(entity);
             return a;
         }

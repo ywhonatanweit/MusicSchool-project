@@ -21,6 +21,13 @@ namespace ViewModel
             return aList;
 
         }
+
+        public bool Exists(int id)
+        {
+            ArtistList artists = SelectAll();
+            return artists.Any(x => x.Id == id);
+        }
+
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             Artist a = entity as Artist;
@@ -56,12 +63,13 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             Artist c = entity as Artist;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO  ArtistTbl (ID) VALUES (@aid)";
+                string sqlStr = "INSERT INTO ArtistTbl (ID) VALUES (@aid)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@aid", c.Id));
             }
         }
         //לא רושם את הפעולה של העדכון כי אין מה לעדכן, יש רק מפתח ראשי

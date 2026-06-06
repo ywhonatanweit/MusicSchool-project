@@ -28,17 +28,17 @@ namespace ViewModel
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             chord a = entity as chord;
-            a.Name = reader["chord"].ToString();
-            a.Difficulty =DifficultyDB.SelectById( int.Parse (reader["difficulty"].ToString())  );
 
-            string imagePath = "\\Users\\User\\source\\repos\\MusicSchool project\\ViewModel\\pictures\\" + reader["chordPath"].ToString();
-            a.Chordpath = imagePath;
-            string base64String = ImageToBase64Converter.ImageToBase64(imagePath);
-            a.Chordpic = base64String;
+            a.Name = reader["chord"].ToString();
+            a.Difficulty = DifficultyDB.SelectById(int.Parse(reader["difficulty"].ToString()));
+
+            a.Chordpic = reader["chordpic"] == DBNull.Value ? "" : reader["chordpic"].ToString();
+            a.Chordpath = reader["chordPath"] == DBNull.Value ? "" : reader["chordPath"].ToString();
 
             base.CreateModel(entity);
             return a;
         }
+
         public override BaseEntity NewEntity()
         {
             return new chord();
@@ -70,45 +70,42 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             chord p = entity as chord;
+
             if (p != null)
             {
-                string sqlStr = $"Insert INTO ChordTbl (Id,chord,difficulty,chordpic,chordPath) " +
-                                "VALUES (@id,@chord,@diffficulty,@chp,@cpa)";
+                string sqlStr =
+                    "INSERT INTO ChordTbl (chord, difficulty, chordpic, chordPath) " +
+                    "VALUES (@chord, @difficulty, @chp, @cpa)";
 
-                command.CommandText = sqlStr;
-
-                command.Parameters.Add(new OleDbParameter("@id", p.Id));
-                command.Parameters.Add(new OleDbParameter("@chord", p.Name));
-                command.Parameters.Add(new OleDbParameter("@difficulty", p.Difficulty.Id));
-                command.Parameters.Add(new OleDbParameter("@chp", p.Chordpic));
-                command.Parameters.Add(new OleDbParameter("@cpa", p.Chordpath));
-
-
-
-
-
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@chord", p.Name ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@difficulty", p.Difficulty.Id));
+                cmd.Parameters.Add(new OleDbParameter("@chp", p.Chordpic ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@cpa", p.Chordpath ?? ""));
             }
         }
+
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             chord c = entity as chord;
+
             if (c != null)
             {
-                string sqlStr = $"UPDATE ChordTbl  SET difficulty=@cName, chord=@chname,chordpic=@chp, chordPath=@cpa WHERE ID=@id";
+                string sqlStr =
+                    "UPDATE ChordTbl " +
+                    "SET chord=@chName, difficulty=@dif, chordpic=@chp, chordPath=@cpa " +
+                    "WHERE ID=@id";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@cName", c.Difficulty.Id));
-                command.Parameters.Add(new OleDbParameter("@chName", c.Name));
-                command.Parameters.Add(new OleDbParameter("@id", c.Id));
-                command.Parameters.Add(new OleDbParameter("@chp", c.Chordpic));
-                command.Parameters.Add(new OleDbParameter("@cpa", c.Chordpath));
-
-
-
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@chName", c.Name ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@dif", c.Difficulty.Id));
+                cmd.Parameters.Add(new OleDbParameter("@chp", c.Chordpic ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@cpa", c.Chordpath ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
-
         }
+    }
             //שלב ב
             //protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
             //{
@@ -145,5 +142,5 @@ namespace ViewModel
             //        command.Parameters.Add(new OleDbParameter("@id", c.Id));
             //    }
             //}
-        }
+        
     }

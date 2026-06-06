@@ -47,10 +47,11 @@ namespace ViewModel
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
-            language x = entity as language;
+            lyrics x = entity as lyrics;
+
             if (x != null)
             {
-                string sqlStr = $"DELETE FROM LanguageTbl where id=@pid";
+                string sqlStr = "DELETE FROM LyricsTbl WHERE id=@pid";
 
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add(new OleDbParameter("@pid", x.Id));
@@ -60,74 +61,76 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             lyrics p = entity as lyrics;
+
             if (p != null)
             {
-                string sqlStr = $"Insert INTO LyricsTbl (id,songid,placment,chordid,lyrics) " +
-                                "VALUES (@id,@sid,@pl,@chid,@lyrics)";
+                string sqlStr =
+                    "INSERT INTO LyricsTbl (songid, placment, chordid, lyrics) " +
+                    "VALUES (@sid, @pl, @chid, @lyrics)";
 
-                command.CommandText = sqlStr;
-
-                command.Parameters.Add(new OleDbParameter("@id", p.Id));
-                command.Parameters.Add(new OleDbParameter("@sid", p.Songid.Id));
-                command.Parameters.Add(new OleDbParameter("@pl", p.Placment));
-                command.Parameters.Add(new OleDbParameter("@chid", p.Chordid.Id));
-                command.Parameters.Add(new OleDbParameter("@lyrics", p.Lyricsname));
-
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@sid", p.Songid.Id));
+                cmd.Parameters.Add(new OleDbParameter("@pl", p.Placment));
+                cmd.Parameters.Add(new OleDbParameter("@chid", p.Chordid.Id));
+                cmd.Parameters.Add(new OleDbParameter("@lyrics", p.Lyricsname ?? ""));
             }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             lyrics c = entity as lyrics;
+
             if (c != null)
             {
-                string sqlStr = $"UPDATE  LyricsTbl  SET [lyrics]=@cName,songid=@sid,placment=@pl,chordid=@chid WHERE ID=@id";
+                string sqlStr =
+                    "UPDATE LyricsTbl " +
+                    "SET songid=@sid, placment=@pl, chordid=@chid, lyrics=@lyrics " +
+                    "WHERE ID=@id";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@cName", c.Lyricsname)); 
-                command.Parameters.Add(new OleDbParameter("@sid", c.Songid.Id));
-                command.Parameters.Add(new OleDbParameter("@pl", c.Placment));
-                command.Parameters.Add(new OleDbParameter("@chid", c.Chordid.Id));
-                command.Parameters.Add(new OleDbParameter("@id", c.Id));    
-
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@sid", c.Songid.Id));
+                cmd.Parameters.Add(new OleDbParameter("@pl", c.Placment));
+                cmd.Parameters.Add(new OleDbParameter("@chid", c.Chordid.Id));
+                cmd.Parameters.Add(new OleDbParameter("@lyrics", c.Lyricsname ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
         }
 
-            //שלב ב
-            //protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
-            //{
-            //    Person c = entity as Person;
-            //    if (c != null)
-            //    {
-            //        string sqlStr = $"DELETE FROM PersonTbl where id=@pid";
+        //שלב ב
+        //protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
+        //{
+        //    Person c = entity as Person;
+        //    if (c != null)
+        //    {
+        //        string sqlStr = $"DELETE FROM PersonTbl where id=@pid";
 
-            //        command.CommandText = sqlStr;
-            //        command.Parameters.Add(new OleDbParameter("@pid", c.Id));
-            //    }
-            //}
-            //protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
-            //{
-            //    Person c = entity as Person;
-            //    if (c != null)
-            //    {
-            //        string sqlStr = $"Insert INTO  PersonTbl (PersonName) VALUES (@cName)";
+        //        command.CommandText = sqlStr;
+        //        command.Parameters.Add(new OleDbParameter("@pid", c.Id));
+        //    }
+        //}
+        //protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
+        //{
+        //    Person c = entity as Person;
+        //    if (c != null)
+        //    {
+        //        string sqlStr = $"Insert INTO  PersonTbl (PersonName) VALUES (@cName)";
 
-            //        command.CommandText = sqlStr;
-            //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
-            //    }
-            //}
+        //        command.CommandText = sqlStr;
+        //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
+        //    }
+        //}
 
-            //protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
-            //{
-            //    lyrics c = entity as lyrics;
-            //    if (c != null)
-            //    {
-            //        string sqlStr = $"UPDATE  LyricsTbl  SET PersonName=@cName WHERE ID=@id";
+        //protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
+        //{
+        //    lyrics c = entity as lyrics;
+        //    if (c != null)
+        //    {
+        //        string sqlStr = $"UPDATE  LyricsTbl  SET PersonName=@cName WHERE ID=@id";
 
-            //        command.CommandText = sqlStr;
-            //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
-            //        command.Parameters.Add(new OleDbParameter("@id", c.Id));
-            //    }
-            //}
-        }
+        //        command.CommandText = sqlStr;
+        //        command.Parameters.Add(new OleDbParameter("@cName", c.PersonName));
+        //        command.Parameters.Add(new OleDbParameter("@id", c.Id));
+        //    }
+        //}
+    }
     }

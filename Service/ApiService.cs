@@ -44,6 +44,7 @@ namespace Service
 
         #endregion
 
+
         #region artist
         public async Task<ArtistList> SelectAllArtists()
         {

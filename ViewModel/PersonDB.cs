@@ -54,14 +54,14 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             person c = entity as person;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO PersonTbl (Pname,Pcode) VALUES (@Pname,Pcode)";
+                string sqlStr = "INSERT INTO PersonTbl (Pname, Pcode) VALUES (@Pname, @Pcode)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@Pname", c.Name));
-                command.Parameters.Add(new OleDbParameter("@Pcode", c.Code));
-
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@Pname", c.Name ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@Pcode", c.Code ?? ""));
             }
         }
 

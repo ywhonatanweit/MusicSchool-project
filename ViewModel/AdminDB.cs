@@ -13,14 +13,14 @@ namespace ViewModel
     {
         public AdminList SelectAll()
         {
-            command.CommandText = $"SELECT PersonTbl.Id, PersonTbl.Pname, PersonTbl.Pcode " +
-                  $"FROM(PersonTbl INNER JOIN" +
-                         $" AdminTbl ON PersonTbl.Id = AdminTbl.ID)";
+            command.CommandText =
+                "SELECT PersonTbl.ID, PersonTbl.Pname, PersonTbl.Pcode " +
+                "FROM PersonTbl INNER JOIN AdminTbl ON PersonTbl.ID = AdminTbl.ID";
 
             AdminList aList = new AdminList(base.Select());
             return aList;
-
         }
+
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             Admin  a = entity as Admin;
