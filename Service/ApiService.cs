@@ -48,7 +48,7 @@ namespace Service
         #region artist
         public async Task<ArtistList> SelectAllArtists()
         {
-            return await client.GetFromJsonAsync<ArtistList>(uri + "/api/Select/ArtistSelector");
+            return await client.GetFromJsonAsync<ArtistList>(uri + "/api/Select/SelectAllArtists");
         }
 
         public async Task<int> InsertAArtist(Artist a)
