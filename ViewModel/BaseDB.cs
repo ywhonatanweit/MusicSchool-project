@@ -1,73 +1,128 @@
 ﻿using Model;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.OleDb; 
-using static ViewModel.BaseDB;
+using System.Data.OleDb;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace ViewModel
 {
     public abstract class BaseDB
     {
-        //protected static string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\User\\source\\repos\\MusicSchool project\\ViewModel\\MusicSchoolDB.accdb";
-        //          C:\Users\User\source\repos\MusicSchool project\ViewModel\MusicSchoolDB.accdb
-        protected static string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="
-                      + System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location
-                      + "/../../../../../ViewModel/MusicSchoolDB.accdb");
+        private static readonly object dbLock = new object();
 
-
-        protected static OleDbConnection connection;
-        protected OleDbCommand command;
-        protected OleDbDataReader reader;
-        public static string Path()
+        private static string GetDbPath()
         {
-            String[] args = Environment.GetCommandLineArgs();
-            string s;
-            if (args.Length == 1)
+            string dbFileName = "MusicSchoolDB.accdb";
+
+            string currentDir = Directory.GetCurrentDirectory();
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            string[] startFolders =
             {
-                s = args[0];
-            }
-            else
+                currentDir,
+                baseDir
+            };
+
+            foreach (string startFolder in startFolders)
             {
-                s = args[1];
-                s = s.Replace("/service:", "");
+                DirectoryInfo? dir = new DirectoryInfo(startFolder);
+
+                for (int i = 0; i < 8 && dir != null; i++)
+                {
+                    string option1 = System.IO.Path.Combine(dir.FullName, "ViewModel", dbFileName);
+                    string option2 = System.IO.Path.Combine(dir.FullName, dbFileName);
+
+                    if (File.Exists(option1))
+                        return option1;
+
+                    if (File.Exists(option2))
+                        return option2;
+
+                    dir = dir.Parent;
+                }
             }
-            string[] st = s.Split('\\');
-            int x = st.Length - 6;
-            st[x] = "ViewModel";
-            Array.Resize(ref st, x + 1);
-            string str = String.Join('\\', st);
-            return str;
+
+            throw new Exception("לא נמצא קובץ מסד הנתונים MusicSchoolDB.accdb");
         }
-        //C:\Users\nativ\Downloads\Exampl_Project\MyWhatApp\VViewModel\ExampleProjectBagrutGrades.accdb
+
+        protected static string connectionString =
+            @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" +
+            GetDbPath() +
+            @";Persist Security Info=False;";
+
+        protected OleDbCommand command;
+        protected OleDbDataReader? reader;
+
         public BaseDB()
         {
-            var x = Path();
-            connection ??= new OleDbConnection(connectionString);
             command = new OleDbCommand();
-            command.Connection = connection;
         }
 
         public abstract BaseEntity NewEntity();
 
-
-
         protected List<BaseEntity> Select()
+        {
+            lock (dbLock)
+            {
+                List<BaseEntity> list = new List<BaseEntity>();
+
+                using (OleDbConnection localConnection = new OleDbConnection(connectionString))
+                {
+                    using (OleDbCommand localCommand = new OleDbCommand(command.CommandText, localConnection))
+                    {
+                        foreach (OleDbParameter parameter in command.Parameters)
+                        {
+                            localCommand.Parameters.Add(
+                                new OleDbParameter(parameter.ParameterName, parameter.Value)
+                            );
+                        }
+
+                        try
+                        {
+                            localConnection.Open();
+
+                            using (OleDbDataReader localReader = localCommand.ExecuteReader())
+                            {
+                                reader = localReader;
+
+                                while (reader.Read())
+                                {
+                                    BaseEntity entity = NewEntity();
+                                    list.Add(CreateModel(entity));
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception(e.Message + "\nSQL:" + command.CommandText);
+                        }
+                        finally
+                        {
+                            reader = null;
+                        }
+                    }
+                }
+
+                return list;
+            }
+        }
+
+        protected async Task<List<BaseEntity>> SelectAsync(string sqlStr)
         {
             List<BaseEntity> list = new List<BaseEntity>();
 
             using (OleDbConnection localConnection = new OleDbConnection(connectionString))
             {
-                using (OleDbCommand localCommand = new OleDbCommand(command.CommandText, localConnection))
+                using (OleDbCommand localCommand = new OleDbCommand(sqlStr, localConnection))
                 {
-                    foreach (OleDbParameter parameter in command.Parameters)
-                    {
-                        localCommand.Parameters.Add(new OleDbParameter(parameter.ParameterName, parameter.Value));
-                    }
-
                     try
                     {
                         localConnection.Open();
 
-                        using (OleDbDataReader localReader = localCommand.ExecuteReader())
+                        using (OleDbDataReader localReader =
+                               (OleDbDataReader)await localCommand.ExecuteReaderAsync())
                         {
                             reader = localReader;
 
@@ -80,7 +135,8 @@ namespace ViewModel
                     }
                     catch (Exception e)
                     {
-                        throw new Exception(e.Message + "\nSQL:" + command.CommandText);
+                        System.Diagnostics.Debug.WriteLine(e.Message + "\nSQL:" + sqlStr);
+                        throw new Exception(e.Message + "\nSQL:" + sqlStr);
                     }
                     finally
                     {
@@ -92,39 +148,6 @@ namespace ViewModel
             return list;
         }
 
-        protected async Task<List<BaseEntity>> SelectAsync(string sqlStr)
-        {
-            OleDbConnection connection = new OleDbConnection();
-            OleDbCommand command = new OleDbCommand();
-            List<BaseEntity> list = new List<BaseEntity>();
-
-            try
-            {
-                command.Connection = connection;
-                command.CommandText = sqlStr;
-                connection.Open();
-                this.reader = (OleDbDataReader)await command.ExecuteReaderAsync();
-
-
-                while (reader.Read())
-                {
-                    BaseEntity entity = NewEntity();
-                    list.Add(CreateModel(entity));
-                }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e.Message + "\nSQL:" + command.CommandText);
-            }
-            finally
-            {
-                if (reader != null) reader.Close();
-                if (connection.State == ConnectionState.Open) connection.Close();
-            }
-            return list;
-        }
-
-
         protected virtual BaseEntity CreateModel(BaseEntity entity)
         {
             entity.Id = (int)reader["id"];
@@ -132,112 +155,114 @@ namespace ViewModel
         }
 
         protected abstract void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd);
-        public static List<ChangeEntity> deleted = new List<ChangeEntity>();
+        protected abstract void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd);
+        protected abstract void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd);
 
+        public static List<ChangeEntity> deleted = new List<ChangeEntity>();
+        public static List<ChangeEntity> inserted = new List<ChangeEntity>();
+        public static List<ChangeEntity> updated = new List<ChangeEntity>();
 
         public virtual void Delete(BaseEntity entity)
         {
             BaseEntity reqEntity = this.NewEntity();
-            if (entity != null & entity.GetType() == reqEntity.GetType())
+
+            if (entity != null && entity.GetType() == reqEntity.GetType())
             {
                 deleted.Add(new ChangeEntity(this.CreateDeletedSQL, entity));
             }
         }
 
-        protected abstract void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd);
-        public static List<ChangeEntity> inserted = new List<ChangeEntity>();
-
-     public virtual void Insert(BaseEntity entity)
-  
-         {
+        public virtual void Insert(BaseEntity entity)
+        {
             BaseEntity reqEntity = this.NewEntity();
-            if (entity != null & entity.GetType() == reqEntity.GetType())
+
+            if (entity != null && entity.GetType() == reqEntity.GetType())
             {
                 inserted.Add(new ChangeEntity(this.CreateInsertdSQL, entity));
             }
         }
 
-        protected abstract void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd);
-        public static List<ChangeEntity> updated = new List<ChangeEntity>();
-
-
         public virtual void Update(BaseEntity entity)
         {
             BaseEntity reqEntity = this.NewEntity();
-            if (entity != null & entity.GetType() == reqEntity.GetType())
+
+            if (entity != null && entity.GetType() == reqEntity.GetType())
             {
                 updated.Add(new ChangeEntity(this.CreateUpdatedSQL, entity));
             }
         }
 
-
-
-
-
-
         public int SaveChanges()
         {
-            OleDbTransaction trans = null;
-            int records_affected = 0;
-
-            try
+            lock (dbLock)
             {
-                command.Connection = connection;
+                OleDbTransaction? trans = null;
+                int recordsAffected = 0;
 
-                if (connection.State != ConnectionState.Open)
+                using (OleDbConnection localConnection = new OleDbConnection(connectionString))
                 {
-                    connection.Open();
+                    using (OleDbCommand localCommand = new OleDbCommand())
+                    {
+                        try
+                        {
+                            localConnection.Open();
+
+                            trans = localConnection.BeginTransaction();
+
+                            localCommand.Connection = localConnection;
+                            localCommand.Transaction = trans;
+
+                            foreach (var entity in inserted)
+                            {
+                                localCommand.Parameters.Clear();
+
+                                entity.CreateSql(entity.Entity, localCommand);
+
+                                recordsAffected += localCommand.ExecuteNonQuery();
+
+                                localCommand.CommandText = "Select @@Identity";
+                                entity.Entity.Id = Convert.ToInt32(localCommand.ExecuteScalar());
+                            }
+
+                            foreach (var entity in updated)
+                            {
+                                localCommand.Parameters.Clear();
+
+                                entity.CreateSql(entity.Entity, localCommand);
+
+                                recordsAffected += localCommand.ExecuteNonQuery();
+                            }
+
+                            foreach (var entity in deleted)
+                            {
+                                localCommand.Parameters.Clear();
+
+                                entity.CreateSql(entity.Entity, localCommand);
+
+                                recordsAffected += localCommand.ExecuteNonQuery();
+                            }
+
+                            trans.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            trans?.Rollback();
+
+                            throw new Exception(ex.Message + "\n SQL:" + localCommand.CommandText);
+                        }
+                        finally
+                        {
+                            inserted.Clear();
+                            updated.Clear();
+                            deleted.Clear();
+                        }
+                    }
                 }
 
-                trans = connection.BeginTransaction();
-                command.Transaction = trans;
-
-                foreach (var entity in inserted)
-                {
-                    command.Parameters.Clear();
-                    entity.CreateSql(entity.Entity, command); //cmd.CommandText = CreateInsertSQL(entity.Entity);
-                    records_affected += command.ExecuteNonQuery();
-
-                    command.CommandText = "Select @@Identity";
-                    entity.Entity.Id = (int)command.ExecuteScalar();
-                }
-
-                foreach (var entity in updated)
-                {
-                    command.Parameters.Clear();
-                    entity.CreateSql(entity.Entity, command);        //cmd.CommandText = CreateUpdateSQL(entity.Entity);
-                    records_affected += command.ExecuteNonQuery();
-                }
-
-                foreach (var entity in deleted)
-                {
-                    command.Parameters.Clear();
-                    entity.CreateSql(entity.Entity, command);
-
-                    records_affected += command.ExecuteNonQuery();
-                }
-
-                trans.Commit();
+                return recordsAffected;
             }
-            catch (Exception ex)
-            {
-                trans.Rollback();
-                throw new Exception(ex.Message + "\n SQL:" + command.CommandText);
-            }
-            finally
-            {
-                inserted.Clear();
-
-                updated.Clear();
-
-                deleted.Clear();
-
-                if (connection.State == System.Data.ConnectionState.Open)
-                    connection.Close();
-            }
-
-            return records_affected;
         }
+
         public class ChangeEntity
         {
             private BaseEntity entity;
@@ -249,11 +274,19 @@ namespace ViewModel
                 this.entity = entity;
             }
 
-            public BaseEntity Entity { get => entity; set => entity = value; }
-            public CreateSql CreateSql { get => createSql; set => createSql = value; }
+            public BaseEntity Entity
+            {
+                get => entity;
+                set => entity = value;
+            }
+
+            public CreateSql CreateSql
+            {
+                get => createSql;
+                set => createSql = value;
+            }
         }
 
         public delegate void CreateSql(BaseEntity entity, OleDbCommand command);
-
     }
 }
