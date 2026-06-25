@@ -30,8 +30,13 @@ namespace ViewModel
             chord a = entity as chord;
 
             a.Name = reader["chord"].ToString();
-            a.Difficulty = DifficultyDB.SelectById(int.Parse(reader["difficulty"].ToString()));
+            int diffValue = int.Parse(reader["difficulty"].ToString());
 
+            a.Difficulty = new difficulty
+            {
+                Id = diffValue,
+                Diff = diffValue
+            };
             a.Chordpic = reader["chordpic"] == DBNull.Value ? "" : reader["chordpic"].ToString();
             a.Chordpath = reader["chordPath"] == DBNull.Value ? "" : reader["chordPath"].ToString();
 
@@ -47,13 +52,17 @@ namespace ViewModel
         public static chord SelectById(int id)
         {
             ChordDB db = new ChordDB();
-            list = db.SelectAll();
 
-            chord g = list.Find(item => item.Id == id );
-            return g;
+            db.command.Parameters.Clear();
+            db.command.CommandText = "SELECT * FROM ChordTbl WHERE ID=@id";
+            db.command.Parameters.Add(new OleDbParameter("@id", id));
+
+            ChordList result = new ChordList(db.Select());
+
+            return result.FirstOrDefault();
         }
 
-  
+
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {

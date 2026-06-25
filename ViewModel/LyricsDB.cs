@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks;
 using static ViewModel.BaseDB;
-
+//hello
 namespace ViewModel
 {
     public class LyricsDB : BaseDB
@@ -21,14 +21,24 @@ namespace ViewModel
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             lyrics a = entity as lyrics;
-            a.Songid = SongDB.SelectById(int.Parse(reader["songid"].ToString()));
-            a.Chordid = ChordDB.SelectById(int.Parse(reader["chordid"].ToString()));
-            a.Placment = int.Parse( reader["placment"].ToString());
-            a.Lyricsname = reader["lyrics"].ToString();
 
 
 
             base.CreateModel(entity);
+
+            int songId = int.Parse(reader["songid"].ToString());
+            int chordId = int.Parse(reader["chordid"].ToString());
+
+            a.Songid = new song
+            {
+                Id = songId
+            };
+
+            a.Chordid = ChordDB.SelectById(chordId);
+
+            a.Placment = int.Parse(reader["placment"].ToString());
+            a.Lyricsname = reader["lyrics"].ToString();
+
             return a;
         }
         public override BaseEntity NewEntity()

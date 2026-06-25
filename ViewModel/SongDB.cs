@@ -22,7 +22,10 @@ namespace ViewModel
         {
             song a = entity as song;
 
+            base.CreateModel(entity);
+
             a.Name = reader["songname"].ToString();
+
             a.Artistid = ArtistDB.SelectById(int.Parse(reader["artistid"].ToString()));
             a.Gaenreid = GenreDB.SelectById(int.Parse(reader["ganreid"].ToString()));
             a.Difficultyid = DifficultyDB.SelectById(int.Parse(reader["difficultyid"].ToString()));
@@ -31,7 +34,6 @@ namespace ViewModel
             a.SongPic = reader["songPic"] == DBNull.Value ? "" : reader["songPic"].ToString();
             a.Songpath = reader["songPath"] == DBNull.Value ? "" : reader["songPath"].ToString();
 
-            base.CreateModel(entity);
             return a;
         }
 
@@ -62,10 +64,14 @@ namespace ViewModel
         public static song SelectById(int id)
         {
             SongDB db = new SongDB();
-            list = db.SelectAll();
 
-            song g = list.Find(item => item.Id == id);
-            return g;
+            db.command.Parameters.Clear();
+            db.command.CommandText = "SELECT * FROM SongTbl WHERE ID=@id";
+            db.command.Parameters.Add(new OleDbParameter("@id", id));
+
+            SongList result = new SongList(db.Select());
+
+            return result.FirstOrDefault();
         }
 
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
