@@ -45,23 +45,26 @@ namespace ViewModel
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             Admin c = entity as Admin;
+
             if (c != null)
             {
-                string sqlStr = $"DELETE FROM AdminTbl where id=@aid";
+                string sqlStr = "DELETE FROM AdminTbl WHERE id=@aid";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@aid", c.Id));
             }
         }
+
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             Admin c = entity as Admin;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO  AdminTbl (ID) VALUES (@aid)";
+                string sqlStr = "INSERT INTO AdminTbl (ID) VALUES (@aid)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@aid", c.Id));
             }
         }
         //לא רושם את הפעולה של העדכון כי אין מה לעדכן, יש רק מפתח ראשי

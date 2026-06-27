@@ -63,25 +63,27 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             difficulty c = entity as difficulty;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO DifficultyTbl (diff) VALUES (@diff)";
+                string sqlStr = "INSERT INTO DifficultyTbl (diff) VALUES (@diff)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@diff", c.Diff));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@diff", c.Diff));
             }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             difficulty c = entity as difficulty;
+
             if (c != null)
             {
-                string sqlStr = $"UPDATE DifficultyTbl  SET diff=@diff WHERE ID=@id";
+                string sqlStr = "UPDATE DifficultyTbl SET diff=@diff WHERE ID=@id";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@diff", c.Diff));
-                command.Parameters.Add(new OleDbParameter("@id", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@diff", c.Diff));
+                cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
         }
 

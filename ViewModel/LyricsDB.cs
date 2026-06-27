@@ -3,49 +3,56 @@ using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks;
-using static ViewModel.BaseDB;
-//hello
+
 namespace ViewModel
 {
     public class LyricsDB : BaseDB
     {
         public LyricsList SelectAll()
         {
-            command.CommandText = $"SELECT * FROM  LyricsTbl";
+            command.CommandText = "SELECT * FROM LyricsTbl";
             LyricsList aList = new LyricsList(base.Select());
             return aList;
         }
+
         protected override BaseEntity CreateModel(BaseEntity entity)
         {
             lyrics a = entity as lyrics;
 
-
-
             base.CreateModel(entity);
 
             int songId = int.Parse(reader["songid"].ToString());
-            int chordId = int.Parse(reader["chordid"].ToString());
 
             a.Songid = new song
             {
                 Id = songId
             };
 
-            a.Chordid = ChordDB.SelectById(chordId);
+            // אם אין אקורד בשורה, Chordid יהיה null
+            if (reader["chordid"] == DBNull.Value ||
+                string.IsNullOrWhiteSpace(reader["chordid"].ToString()))
+            {
+                a.Chordid = null;
+            }
+            else
+            {
+                int chordId = int.Parse(reader["chordid"].ToString());
+                a.Chordid = ChordDB.SelectById(chordId);
+            }
 
             a.Placment = int.Parse(reader["placment"].ToString());
-            a.Lyricsname = reader["lyrics"].ToString();
+            a.Lyricsname = reader["lyrics"] == DBNull.Value ? "" : reader["lyrics"].ToString();
 
             return a;
         }
+
         public override BaseEntity NewEntity()
         {
             return new lyrics();
         }
+
         static private LyricsList list = new LyricsList();
+
         public static lyrics SelectById(int id)
         {
             LyricsDB db = new LyricsDB();
@@ -79,9 +86,15 @@ namespace ViewModel
                     "VALUES (@sid, @pl, @chid, @lyrics)";
 
                 cmd.CommandText = sqlStr;
+
                 cmd.Parameters.Add(new OleDbParameter("@sid", p.Songid.Id));
                 cmd.Parameters.Add(new OleDbParameter("@pl", p.Placment));
-                cmd.Parameters.Add(new OleDbParameter("@chid", p.Chordid.Id));
+
+                if (p.Chordid == null)
+                    cmd.Parameters.Add(new OleDbParameter("@chid", DBNull.Value));
+                else
+                    cmd.Parameters.Add(new OleDbParameter("@chid", p.Chordid.Id));
+
                 cmd.Parameters.Add(new OleDbParameter("@lyrics", p.Lyricsname ?? ""));
             }
         }
@@ -98,13 +111,21 @@ namespace ViewModel
                     "WHERE ID=@id";
 
                 cmd.CommandText = sqlStr;
+
                 cmd.Parameters.Add(new OleDbParameter("@sid", c.Songid.Id));
                 cmd.Parameters.Add(new OleDbParameter("@pl", c.Placment));
-                cmd.Parameters.Add(new OleDbParameter("@chid", c.Chordid.Id));
+
+                if (c.Chordid == null)
+                    cmd.Parameters.Add(new OleDbParameter("@chid", DBNull.Value));
+                else
+                    cmd.Parameters.Add(new OleDbParameter("@chid", c.Chordid.Id));
+
                 cmd.Parameters.Add(new OleDbParameter("@lyrics", c.Lyricsname ?? ""));
                 cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
         }
+    }
+}
 
         //שלב ב
         //protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
@@ -142,5 +163,4 @@ namespace ViewModel
         //        command.Parameters.Add(new OleDbParameter("@id", c.Id));
         //    }
         //}
-    }
-    }
+   

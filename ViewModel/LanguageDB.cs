@@ -56,25 +56,27 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             language c = entity as language;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO languageTbl ([language]) VALUES (@language)";
+                string sqlStr = "INSERT INTO LanguageTbl ([language]) VALUES (@language)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@language", c.Languagename));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@language", c.Languagename ?? ""));
             }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             language c = entity as language;
+
             if (c != null)
             {
-                string sqlStr = $"UPDATE languageTbl  SET [language]=@lan WHERE ID=@id";
+                string sqlStr = "UPDATE LanguageTbl SET [language]=@lan WHERE ID=@id";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@lan", c.Languagename));
-                command.Parameters.Add(new OleDbParameter("@id", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@lan", c.Languagename ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
         }
 

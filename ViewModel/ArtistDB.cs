@@ -48,16 +48,17 @@ namespace ViewModel
             return g;
         }
 
-      //  שלב ב
+        //  שלב ב
         protected override void CreateDeletedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             Artist c = entity as Artist;
+
             if (c != null)
             {
-                string sqlStr = $"DELETE FROM ArtistTbl where id=@aid";
+                string sqlStr = "DELETE FROM ArtistTbl WHERE id=@aid";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@aid", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@aid", c.Id));
             }
         }
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)

@@ -56,25 +56,27 @@ namespace ViewModel
         protected override void CreateInsertdSQL(BaseEntity entity, OleDbCommand cmd)
         {
             genre c = entity as genre;
+
             if (c != null)
             {
-                string sqlStr = $"Insert INTO genreTbl (genre) VALUES (@genre)";
+                string sqlStr = "INSERT INTO GenreTbl (genre) VALUES (@genre)";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@genre", c.Genrename));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@genre", c.Genrename ?? ""));
             }
         }
 
         protected override void CreateUpdatedSQL(BaseEntity entity, OleDbCommand cmd)
         {
             genre c = entity as genre;
+
             if (c != null)
             {
-                string sqlStr = $"UPDATE genreTbl  SET genre=@gName WHERE ID=@id";
+                string sqlStr = "UPDATE GenreTbl SET genre=@gName WHERE ID=@id";
 
-                command.CommandText = sqlStr;
-                command.Parameters.Add(new OleDbParameter("@gName", c.Genrename));
-                command.Parameters.Add(new OleDbParameter("@id", c.Id));
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add(new OleDbParameter("@gName", c.Genrename ?? ""));
+                cmd.Parameters.Add(new OleDbParameter("@id", c.Id));
             }
         }
 
